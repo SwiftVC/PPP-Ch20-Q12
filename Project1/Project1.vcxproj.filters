@@ -29,5 +29,8 @@
     <ClInclude Include="CS_list_templates.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CS_allocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

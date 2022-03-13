@@ -1,26 +1,38 @@
 /*
 *	Author: CS
-*	Date:	2022_03_12
+*	Date:	2022_03_13
 *
-*	This is a recreation of the STL list (working back from the user interface) like the STL where it manages it's own memory as opposed to the
-*	pointer handling of previous chapters.
-*	It's been left in non-generalized integer element form for readability.
-*	+ve the list works when reduced to nothing and grown again, the memory is properly deallocated.
+*	This is worked from a copy of Ch20 Q13, along with the CS_Allocator header (name changed) from Ch19 Q09
+*	
+*	The list class's implementation is rewritten from the next question (this is Q12, next is Q13) to use an allocator,
+*	and to keep one list node allocated, as to terminate the list.
+*	In doing so, it complicates the checking through the list, as the end of the list is determined via the list size integer
+*	throughout the program as we can no longer check for termination with the null pointer.
+*	It isn't generalized for the sake of readability.
 * 
-*	Criticism:
-*	The iterator used for list is not declared in the namespace of the list interface but in the list_node and so the user sees an unintuitive naming convention
-*	for iterators.
-*	No structured testing procedure was made for this more complicated environment.
+*	The std::cout output was commented out to verify that there is no heap memory leak.
 * 
-*	Lesson:
-*	When testing the non-templated version, the methods should be in a standard, non-header file
+*	Criticisms:
+*	-ve		Inconsistent approach to connecting list_nodes objects -sometimes unnecessary temporary variables are added.
+*	-ve		Testing of each function was not stored for convienient proofing and final validation
 */
+
+// Changes from Ch20 Q13:
+// alloc<list_node> private object
+// list() includes alloc, list(int) includes alloc					(passes memory check for allocation and deallocation)
+// push_back() uses allocator method
+// push_front() uses allocator method
+// erase() uses allocator method
+// last() uses allocator method
+// insert() uses allocator method
+
 
 #include <iostream>
 #include "CS_list.h"
 
 int main() {
 	try{
+		
 		{
 			list newlist(5);	// initializes a list with the number 5 as the first element
 			newlist.erase(newlist.begin());
@@ -31,11 +43,13 @@ int main() {
 			newlist.push_back(200);
 			newlist.push_back(900);
 			newlist.push_back(50);
+
 			std::cout << "The list is as follows:\n";
 			newlist.print();
 			std::cout << "Testing the list with a function of STL style:\n";
 			std::cout << "The highest is:\t" << *high(newlist.begin(), newlist.end()) << std::endl;
 			std::cout << "Iterators with the list object work as expected.\n";
+			
 		}
 	}
 	catch (std::exception e)

@@ -1,6 +1,7 @@
 #ifndef CS_list_h_
 #define CS_list_h_
 #include <iostream>
+#include "CS_allocator.h"
 
 
 template<typename Iter> // requires Input_iterator<Iter>() (§19.3.3)
@@ -48,22 +49,35 @@ public:
 class list {
 private:
 	list_node* get_node(list_node::iterator p);
+	list_node* front_ptr;
+	int size{ 0 };
+	cs_allocator<list_node> alloc;
 public:
 	list(int i) {
-		front_ptr = new list_node(i);
+		front_ptr = alloc.allocate(1);
+		alloc.construct(front_ptr, i);
 		size = 1;
+		front_ptr->_tail = alloc.allocate(1);
 	}
-	list() : front_ptr{ nullptr }, size{ 0 } {}
+	list() : size{ 0 } { front_ptr = alloc.allocate(1); }
 	~list() {
 		if (size > 0)
 		{
 			while (size > 0)
 			{
 				auto temp = front_ptr->_tail;
-				delete front_ptr;
+				alloc.destroy(front_ptr);
+				alloc.deallocate(front_ptr, 1);
 				front_ptr = temp;
 				size--;
+				if (size == 0)
+				{
+					alloc.deallocate(front_ptr, 1);
+				}
 			}
+		}
+		else {
+			alloc.deallocate(front_ptr, 1);
 		}
 	} // use iterator to erase
 
@@ -82,9 +96,7 @@ public:
 	{	return **front_ptr;	}
 	int& back()				// the last intent
 	{	return  **(get_node(last()));	}
-private:
-	list_node* front_ptr;
-	int size{ 0 };
+
 };
 
 
